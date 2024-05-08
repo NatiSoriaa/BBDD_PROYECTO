@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados</title>
+</head>
+<body>
+    <h1>Resultados</h1>
+    {% if datos_contaminacion %}
+    <p>Contaminación en el barrio {{ datos_contaminacion.Nom_barri }} el día {{ datos_contaminacion.DIA }}:</p>
+    <ul>
+        <li>Contaminante: {{ datos_contaminacion.CODI_CONTAMINANT }}</li>
+    </ul>
+    {% else %}
+    <p>No se encontraron datos para el barrio y día seleccionados.</p>
+    {% endif %}
+</body>
+</html>
