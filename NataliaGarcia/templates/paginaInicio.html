@@ -23,12 +23,7 @@
 
             <div>
                 <p>SELECCIONE UN DIA:</p>
-                <select name="diaHTML">
-                    <option disabled selected>Seleccione un dia</option>
-                    {% for i in range(1,32) %}
-                        <option value="{{i}}">{{i}}</option>
-                    {% endfor %}
-                </select>
+                <input type="number" id="dia" name="dia" min="1" max="31"><br><br>
             </div>  
             <button type="submit">Consultar Información</button> 
         </form>
@@ -36,8 +31,3 @@
     <footer>
 
     </footer>
-    
-
-
-</body>
-</html>
