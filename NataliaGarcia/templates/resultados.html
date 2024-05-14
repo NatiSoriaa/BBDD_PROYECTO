@@ -7,14 +7,19 @@
 </head>
 <body>
     <h1>Resultados</h1>
-    <p>La estacion se llama {{ubicacionEstacion[-1]}}</p>
-    <p>Se encuentra en el barrio {{barrioHTML}}, distrito {{ubicacionEstacion[0]}}:</p>
+    <p>La estacion se llama {{nombreCabina}}</p>
+    <p>Se encuentra en el barrio {{barrioHTML}}, distrito {{ubicacionCabina}}:</p>
     <p>Los contaminantes en el aire del día {{diaMes}} de Marzo fueron:</p>
     <ul>
-        {% for item in nombresContaminantes %}
-        <li>Contaminante: {{item}}</li>
+        {% for i in range(bucle) %}
+        <div>
+            <li>Codigo contaminante: {{codigosContaminantesActivos[i]}}</li>
+            <li>Nombre contaminante: {{informacionContaminantes[i][0]}}</li>
+            <li>Cantidad en aire: {{cantidadContaminanteAire[i]}} {{informacionContaminantes[i][1]}}</li>
+        </div>
         {% endfor %}
     </ul>
   
 </body>
 </html>
+
