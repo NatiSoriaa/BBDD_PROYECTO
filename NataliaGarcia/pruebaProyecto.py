@@ -147,13 +147,14 @@ def index():
         print('Nombre barrio '+barrioHTML+"     Codigo: "+str(barrio))
         print("___________________________________")
 
-        diaMes=request.form.get("diaHTML")
+        diaMes=request.form.get("dia")
         print('Dia mes escogido: '+str(diaMes))
         print("___________________________________")
 
         informacionCentro=informacionEstacion(myDB,barrio)
-        codigosContaminantesActivos,cantidadContaminanteAire=find(myDB, barrio, diaMes)
+        codigosContaminantesActivos,cantidadContaminanteAire=find(myDB, barrio, int(diaMes))
         informacionContaminantes=buscarContaminantes(myDB,codigosContaminantesActivos)
+        print(codigosContaminantesActivos)
         
         
     
