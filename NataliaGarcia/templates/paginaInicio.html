@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Contaminación</title>
+</head>
+<body>
+    <head>
+        <h1>Consulta de Contaminación</h1>
+    </head>
+    <main>
+        <form action="/paginaInicio" method="POST">
+            <div>
+                <p>SELECCIONE UN BARRIO:</p>
+                <select name="barrioHTML">
+                    <option disabled selected>Seleccione un barrio</option>
+                    {% for barrio in listaBarrios %}
+                        <option value="{{barrio}}">{{barrio}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <p>SELECCIONE UN DIA:</p>
+                <select name="diaHTML">
+                    <option disabled selected>Seleccione un dia</option>
+                    {% for i in range(1,32) %}
+                        <option value="{{i}}">{{i}}</option>
+                    {% endfor %}
+                </select>
+            </div>  
+            <button type="submit">Consultar Información</button> 
+        </form>
+    </main>
+    <footer>
+
+    </footer>
+    
+
+
+</body>
+</html>

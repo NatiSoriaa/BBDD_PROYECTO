@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados</title>
+</head>
+<body>
+    <h1>Resultados</h1>
+    <p>La estacion se llama {{ubicacionEstacion[-1]}}</p>
+    <p>Se encuentra en el barrio {{barrioHTML}}, distrito {{ubicacionEstacion[0]}}:</p>
+    <p>Los contaminantes en el aire del día {{diaMes}} de Marzo fueron:</p>
+    <ul>
+        {% for item in nombresContaminantes %}
+        <li>Contaminante: {{item}}</li>
+        {% endfor %}
+    </ul>
+  
+</body>
+</html>
