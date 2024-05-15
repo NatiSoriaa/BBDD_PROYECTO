@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultados</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Resultados.css')}}">
 </head>
 <body>
+    <div class="container">
     <h1>Resultados</h1>
     <p>La estacion se llama {{ubicacionEstacion[-1]}}</p>
     <p>Se encuentra en el barrio {{barrioHTML}}, distrito {{ubicacionEstacion[0]}}:</p>
@@ -15,6 +17,6 @@
         <li>Contaminante: {{item}}</li>
         {% endfor %}
     </ul>
-  
+</div>
 </body>
 </html>
