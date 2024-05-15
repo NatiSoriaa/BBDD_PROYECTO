@@ -97,40 +97,6 @@ def buscarContaminantes(myDB,listaContaminantes):
 
 
 
-
-# # COMPROBACION FUNCIONES:
-
-# myDB=iniciarMongoDB()
-
-# # #1 FUNCIÓN EXTRAER NOMBRES BARRIOS
-# barrios=encontrarBarrios(myDB)
-# print("Los barrios son:")
-# for barrio in barrios:
-#     print(barrio)
-# print("------------------------")
-
-# # DATOS
-# codigoBarrio=checkCodigoBarrio("Sant Pere, Santa Caterina i la Ribera")
-# diaMes=18
-
-# informacionCentro=informacionEstacion(myDB,codigoBarrio)
-# codigosContaminantesActivos,cantidadContaminanteAire=find(myDB, codigoBarrio, diaMes)
-# informacionContaminantes=buscarContaminantes(myDB,codigosContaminantesActivos)
-
-
-# print("El codigo del barrio seleccionado es: "+str(codigoBarrio))
-# print("El nombre de su la cabina es: "+informacionCentro[0][0]+" y su ubicacion está en : "+informacionCentro[0][1])
-# print("los contaminantes que tenia en el día escogido son:")
-# for i in range(len(codigosContaminantesActivos)):
-#     print("Codigo contaminante es: "+str(codigosContaminantesActivos[i]))
-#     print("Nombre contaminante: "+informacionContaminantes[i][0])
-#     print("Cantidad en aire: "+str(cantidadContaminanteAire[i])+" "+informacionContaminantes[i][1])
-#     print("-----------------------------------------")
-
-
-
-
-
 @app.route('/paginaInicio', methods=["GET","POST"])
 
 def index():
