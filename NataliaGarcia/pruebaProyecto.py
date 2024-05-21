@@ -6,60 +6,61 @@ app = Flask(__name__, template_folder='templates')
 
 
 def iniciarMongoDB():
-    MONGO_URI = 'mongodb+srv://natgsarabia:Fsu6t4y5jUfhYQxI@contaminacionbcn.xbosddo.mongodb.net/'
+    url = 'mongodb+srv://natgsarabia:Fsu6t4y5jUfhYQxI@contaminacionbcn.xbosddo.mongodb.net/'
 
-    myClient = pymongo.MongoClient(MONGO_URI)
+    myClient = pymongo.MongoClient(url)
 
     myDB = myClient['contaminacionBCN']
     return myDB
 
 
-# FUNCIÓN EXTRAER NOMBRES BARRIOS
+#1  FUNCIÓN EXTRAER NOMBRES BARRIOS
 def encontrarBarrios(myDB):
     collection=myDB['Estaciones']
     listaBarrios=collection.distinct('Nom_barri')
     return listaBarrios
 
-# FUNCIÓN EXTRAER UBICACION ESTACIONES
-def informacionEstacion(myDB,barrio):
-    estaciones=myDB['Estaciones']
+#2  FUNCIÓN EXTRAER UBICACION ESTACIONES
+def informacionEstacion(myDB,barrio): 
+    collection=myDB['Estaciones']
+    query={'Estacio': barrio}
 
-    query={'Codi_barri': barrio}
     informacionEstacion=[]
   
-    iter=estaciones.find(query,{'_id':0, 'nom_cabina':1,'ubicacio':1})
+    iter=collection.find(query,{'_id':0, 'nom_cabina':1,'ubicacio':1})
     i=0
-    for doc in iter:
-        doc=dict(doc)
-        valoresDoc=doc.items()
-        listaDatos=list(valoresDoc)
-        informacionEstacion.insert(i,listaDatos[0][1])
-        informacionEstacion.insert(i,listaDatos[1][1])
-        i+=1
-
     
+    for doc in iter:
+        if i<1:
+            doc=dict(doc)
+            valoresDoc=doc.items()
+            listaDatos=list(valoresDoc)
+            informacionEstacion.append((listaDatos[0][1],listaDatos[1][1]))
+            i+=1
+
     return informacionEstacion
 
 
-# FUNCIÓN BUSQUEDA RESULTADO
+#3 FUNCIÓN BUSQUEDA RESULTADO
 def find(myDB,codigoEstacion, diaMes):
     collection=myDB['CalidadAire']
     query={'ESTACIO': codigoEstacion, 'DIA':diaMes}
   
     codigosContaminantesActivos=[]
+    cantidadContaminanteAire=[]
     
-    iter=collection.find(query,{'CODI_CONTAMINANT':1})
+    iter=collection.find(query,{'_id':0,'CODI_CONTAMINANT':1,'H12':1})
     i=0
     for doc in iter:
         doc=dict(doc)
         valoresDoc=doc.items()
         listaDatos=list(valoresDoc)
-        codigosContaminantesActivos.insert(i,listaDatos[1][1])
-        i+=1
+        codigosContaminantesActivos.insert(i,listaDatos[0][1])
+        cantidadContaminanteAire.insert(i,listaDatos[1][1])
+    
+    return codigosContaminantesActivos,cantidadContaminanteAire
 
-    return(codigosContaminantesActivos)
-
-# ENCONTRAR NOMBRE BARRIO
+#4 ENCONTRAR NOMBRE BARRIO
 def checkCodigoBarrio(barrioHTML):
     barrios = {
         "el Poblenou":4,
@@ -75,24 +76,23 @@ def checkCodigoBarrio(barrioHTML):
     return barrios.get(barrioHTML)
 
 
-# FUNCIÓN BUSQUEDA CONTAMINANTES 
+#5 FUNCIÓN BUSQUEDA CONTAMINANTES 
 def buscarContaminantes(myDB,listaContaminantes):
     nombresContamimantes=[]
     collection=myDB['Contaminantes']
-
     i=0
-
     for contaminante in listaContaminantes:
         query={'Codi_Contaminant': contaminante}
-        iter=collection.find(query,{'Desc_Contaminant':1})
-        for item in iter:
-            contaminantes=dict(item)
-            nombreContamimante=contaminantes.items()
-            listaNombrescontaminantes=list(nombreContamimante)
-            nombresContamimantes.insert(i,listaNombrescontaminantes[1][1])
-            i+=1     
-            
+        iter=collection.find(query,{'_id':0,'Desc_Contaminant':1,'Unitats':1})
+        for dato in iter:
+            informacionContaminante=dict(dato)
+            valoresDoc=informacionContaminante.items()
+            listaDatos=list(valoresDoc)
+            nombresContamimantes.insert(i,(listaDatos[0][1],listaDatos[1][1]))
+            i+=1
+           
     return(nombresContamimantes)
+
 
 
 
@@ -103,23 +103,30 @@ def index():
     myDB=iniciarMongoDB()
     if request.method=="GET":
         listaBarrios=encontrarBarrios(myDB)
+        print(listaBarrios)
+        print("___________________________________")
         return render_template("paginaInicio.html",listaBarrios=listaBarrios)
 
     elif request.method=="POST":
         barrioHTML=request.form.get("barrioHTML")
         barrio=checkCodigoBarrio(barrioHTML)
+        print('Nombre barrio '+barrioHTML+"     Codigo: "+str(barrio))
+        print("___________________________________")
 
-        diaMes=request.form.get("diaHTML")
+        diaMes=request.form.get("dia")
+        print('Dia mes escogido: '+str(diaMes))
+        print("___________________________________")
 
-        codigosContaminantes=find(myDB, int(barrio), int(diaMes))
-        nombresContaminantes=buscarContaminantes(myDB,codigosContaminantes)
-        ubicacionEstacion=informacionEstacion(myDB,int(barrio))
-        print(codigosContaminantes)
-        print(nombresContaminantes)
-        print(ubicacionEstacion)
+        informacionCentro=informacionEstacion(myDB,barrio)
+        codigosContaminantesActivos,cantidadContaminanteAire=find(myDB, barrio, int(diaMes))
+        informacionContaminantes=buscarContaminantes(myDB,codigosContaminantesActivos)
+        print(codigosContaminantesActivos)
+        
         
     
-        return render_template("resultados.html",nombresContaminantes=nombresContaminantes,diaMes=diaMes,barrioHTML=barrioHTML,ubicacionEstacion=ubicacionEstacion)
+        return render_template("resultados.html",diaMes=diaMes,barrioHTML=barrioHTML,nombreCabina=informacionCentro[0][0],ubicacionCabina=informacionCentro[0][1],\
+                               codigosContaminantesActivos=codigosContaminantesActivos,cantidadContaminanteAire=cantidadContaminanteAire,\
+                                informacionContaminantes=informacionContaminantes, bucle=int(len(codigosContaminantesActivos)))
 
 if __name__=='__main__':
     app.run(debug=True)

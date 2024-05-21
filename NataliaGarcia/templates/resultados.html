@@ -9,14 +9,36 @@
 <body>
     <div class="container">
     <h1>Resultados</h1>
-    <p>La estacion se llama {{ubicacionEstacion[-1]}}</p>
-    <p>Se encuentra en el barrio {{barrioHTML}}, distrito {{ubicacionEstacion[0]}}:</p>
+    <p>La estacion se llama {{nombreCabina}}</p>
+    <p>Se encuentra en el barrio {{barrioHTML}}, distrito {{ubicacionCabina}}:</p>
     <p>Los contaminantes en el aire del día {{diaMes}} de Marzo fueron:</p>
+<<<<<<< HEAD
     <ul>
         {% for item in nombresContaminantes %}
         <li>Contaminante: {{item}}</li>
         {% endfor %}
     </ul>
 </div>
+=======
+    
+    <table>
+        <tr>
+            <th>CODIGO</th>
+            <th>NOMBRE</th>
+            <th>CANTIDAD</th>
+            </tr>
+            {% for i in range(bucle) %}
+            <tr>
+                <td>{{codigosContaminantesActivos[i]}}</td>
+                <td>{{informacionContaminantes[i][0]}}</td>
+                <td>{{cantidadContaminanteAire[i]}} {{informacionContaminantes[i][1]}}</td>
+            </tr>
+            {% endfor %}
+    </table>
+        
+
+  
+>>>>>>> 67025a53dd1fe857f5b5fd05f770308763c54cba
 </body>
 </html>
+
