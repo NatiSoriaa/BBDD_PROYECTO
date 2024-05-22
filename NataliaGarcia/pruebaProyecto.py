@@ -1,147 +1,100 @@
-import pymongo
-from pymongo import MongoClient
 from flask import Flask, render_template, request
+import pymongo
 
 app = Flask(__name__, template_folder='templates')
 
-
 def iniciarMongoDB():
     url = 'mongodb+srv://natgsarabia:Fsu6t4y5jUfhYQxI@contaminacionbcn.xbosddo.mongodb.net/'
-
     myClient = pymongo.MongoClient(url)
-
     myDB = myClient['contaminacionBCN']
     return myDB
 
-
 #1  FUNCIÓN EXTRAER NOMBRES BARRIOS
 def encontrarBarrios(myDB):
-    collection=myDB['Estaciones']
-    listaBarrios=collection.distinct('Nom_barri')
+    collection = myDB['Estaciones']
+    listaBarrios = collection.distinct('Nom_barri')
     return listaBarrios
 
 #2  FUNCIÓN EXTRAER UBICACION ESTACIONES
-def informacionEstacion(myDB,barrio): 
-    collection=myDB['Estaciones']
-    query={'Estacio': barrio}
-
-    informacionEstacion=[]
-  
-    iter=collection.find(query,{'_id':0, 'nom_cabina':1,'ubicacio':1})
-    i=0
-    
+def informacionEstacion(myDB, barrio): 
+    collection = myDB['Estaciones']
+    query = {'Estacio': barrio}
+    informacionEstacion = []
+    iter = collection.find(query, {'_id':0, 'nom_cabina':1,'ubicacio':1})
+    i = 0
     for doc in iter:
-        if i<1:
-            doc=dict(doc)
-            valoresDoc=doc.items()
-            listaDatos=list(valoresDoc)
-            informacionEstacion.append((listaDatos[0][1],listaDatos[1][1]))
-            i+=1
-
+        if i < 1:
+            doc = dict(doc)
+            valoresDoc = doc.items()
+            listaDatos = list(valoresDoc)
+            informacionEstacion.append((listaDatos[0][1], listaDatos[1][1]))
+            i += 1
     return informacionEstacion
 
-
 #3 FUNCIÓN BUSQUEDA RESULTADO
-def find(myDB,codigoEstacion, diaMes):
-    collection=myDB['CalidadAire']
-    query={'ESTACIO': codigoEstacion, 'DIA':diaMes}
-  
-    codigosContaminantesActivos=[]
-    cantidadContaminanteAire=[]
-    
-    iter=collection.find(query,{'_id':0,'CODI_CONTAMINANT':1,'H12':1})
-    i=0
+def find(myDB, codigoEstacion, diaMes):
+    collection = myDB['CalidadAire']
+    query = {'ESTACIO': codigoEstacion, 'DIA': diaMes}
+    codigosContaminantesActivos = []
+    cantidadContaminanteAire = []
+    iter = collection.find(query, {'_id':0, 'CODI_CONTAMINANT':1, 'H12':1})
+    i = 0
     for doc in iter:
-        doc=dict(doc)
-        valoresDoc=doc.items()
-        listaDatos=list(valoresDoc)
-        codigosContaminantesActivos.insert(i,listaDatos[0][1])
-        cantidadContaminanteAire.insert(i,listaDatos[1][1])
-    
-    return codigosContaminantesActivos,cantidadContaminanteAire
+        doc = dict(doc)
+        valoresDoc = doc.items()
+        listaDatos = list(valoresDoc)
+        codigosContaminantesActivos.insert(i, listaDatos[0][1])
+        cantidadContaminanteAire.insert(i, listaDatos[1][1])
+    return codigosContaminantesActivos, cantidadContaminanteAire
 
 #4 ENCONTRAR NOMBRE BARRIO
 def checkCodigoBarrio(barrioHTML):
     barrios = {
-        "el Poblenou":4,
-        "Sants":42,
-        "la Nova Esquerra de l\'Eixample" : 43,
-        "la Vila de Gracia" : 44,
-        "Sant Pere, Santa Caterina i la Ribera" : 50,
-        "la Vall d\'Hebron" : 54,
-        "Pedralbes":57,
-        "Vallvidrera-el Tibidabo-les Planes":58
+        "el Poblenou": 4,
+        "Sants": 42,
+        "la Nova Esquerra de l'Eixample": 43,
+        "la Vila de Gracia": 44,
+        "Sant Pere, Santa Caterina i la Ribera": 50,
+        "la Vall d'Hebron": 54,
+        "Pedralbes": 57,
+        "Vallvidrera-el Tibidabo-les Planes": 58
     }
-
     return barrios.get(barrioHTML)
 
-
 #5 FUNCIÓN BUSQUEDA CONTAMINANTES 
-def buscarContaminantes(myDB,listaContaminantes):
-    nombresContamimantes=[]
-    collection=myDB['Contaminantes']
+def buscarContaminantes(myDB, listaContaminantes):
+    nombresContamimantes = []
+    collection = myDB['Contaminantes']
     for i, contaminante in enumerate(listaContaminantes):
-        query={'Codi_Contaminant': contaminante}
-        iter=collection.find(query,{'_id':0,'Desc_Contaminant':1,'Unitats':1})
-
-        find=False
+        query = {'Codi_Contaminant': contaminante}
+        iter = collection.find(query, {'_id':0, 'Desc_Contaminant':1, 'Unitats':1})
+        find = False
         for dato in iter:
             descripcion = dato.get('Desc_Contaminant', "CONTAMINANTE NO REGISTRADO")
             unidades = dato.get('Unitats', "")
             nombresContamimantes.append((descripcion, unidades))
-            find=True
+            find = True
             
         if not find:
-            nombresContamimantes.append(("CONTAMINANTE NO REGRISTRADO"," "))
-           
+            nombresContamimantes.append(("CONTAMINANTE NO REGRISTRADO", " "))
     return nombresContamimantes
 
-
-
-
-
-@app.route('/paginaInicio', methods=["GET","POST"])
-
+@app.route('/paginaInicio', methods=["GET", "POST"])
 def index():
-    myDB=iniciarMongoDB()
-    if request.method=="GET":
-        listaBarrios=encontrarBarrios(myDB)
-        print(listaBarrios)
-        print("___________________________________")
-        return render_template("paginaInicio.html",listaBarrios=listaBarrios)
+    myDB = iniciarMongoDB()
 
-    elif request.method=="POST":
-        barrioHTML=request.form.get("barrioHTML")
-        print(barrioHTML)
-        barrio=checkCodigoBarrio(barrioHTML)
-        print('Nombre barrio '+barrioHTML+"     Codigo: "+str(barrio))
-        print("___________________________________")
+    if request.method == "GET":
+        listaBarrios = encontrarBarrios(myDB)
+        return render_template("paginaInicio.html", listaBarrios=listaBarrios)
+    
+    elif request.method == "POST":
+        barrioHTML = request.form.get("barrioHTML")
+        barrio = checkCodigoBarrio(barrioHTML)
+        diaMes = request.form.get("dia")
+        informacionCentro = informacionEstacion(myDB, barrio)
+        codigosContaminantesActivos, cantidadContaminanteAire = find(myDB, barrio, int(diaMes))
+        informacionContaminantes = buscarContaminantes(myDB, codigosContaminantesActivos)
+        return render_template("resultados.html", diaMes=diaMes, barrioHTML=barrioHTML, nombreCabina=informacionCentro[0][0], ubicacionCabina=informacionCentro[0][1], codigosContaminantesActivos=codigosContaminantesActivos, cantidadContaminanteAire=cantidadContaminanteAire, informacionContaminantes=informacionContaminantes, bucle=int(len(codigosContaminantesActivos)))
 
-        diaMes=request.form.get("dia")
-        print('Dia mes escogido: '+str(diaMes))
-        print("___________________________________")
-
-        informacionCentro=informacionEstacion(myDB,barrio)
-        print(informacionCentro)
-        codigosContaminantesActivos,cantidadContaminanteAire=find(myDB, barrio, int(diaMes))
-        print(codigosContaminantesActivos)
-        print(cantidadContaminanteAire)
-        informacionContaminantes=buscarContaminantes(myDB,codigosContaminantesActivos)
-        print(informacionContaminantes)
-        
-        
-        return render_template("resultados.html",diaMes=diaMes,barrioHTML=barrioHTML,nombreCabina=informacionCentro[0][0],ubicacionCabina=informacionCentro[0][1],\
-                               codigosContaminantesActivos=codigosContaminantesActivos,cantidadContaminanteAire=cantidadContaminanteAire,\
-                                informacionContaminantes=informacionContaminantes, bucle=int(len(codigosContaminantesActivos)))
-
-if __name__=='__main__':
+if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
-
-
-
-
-

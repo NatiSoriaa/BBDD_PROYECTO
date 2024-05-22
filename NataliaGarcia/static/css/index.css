@@ -2,11 +2,16 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    background-image: url('https://www.shbarcelona.es/blog/es/wp-content/uploads/2017/09/Calles-barcelona.jpg');
+    background-size: cover; 
+    background-position: center; 
+    background-attachment: fixed; 
 }
 
 h1 {
     text-align: center;
     margin-top: 20px;
+    color: white;
 }
 
 main {
